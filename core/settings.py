@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 
     # 3rd Party
     'rest_framework',
+    'rest_framework_simplejwt',
 
     # Local aps
     'accounts.apps.AccountsConfig',
@@ -107,6 +109,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=20),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ALGORITHM': 'HS256',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

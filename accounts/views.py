@@ -1,6 +1,8 @@
-from django.views import generic
-from rest_framework import generics, serializers
+from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework_simplejwt import tokens
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 from .models import User
 from .serializers import RegistrationSerializer, CodeSerializer
@@ -35,6 +37,6 @@ class VerifyEmail(generics.GenericAPIView):
         user = User.objects.filter(activation_code=serializer.validated_data['code']).first()
         user.activation_code = None
         user.save()
+        tokens = user.tokens
 
-        # TODO return tokens for user
-        return Response({"message": "Successfully activated"})
+        return Response({"message": "Successfully activated", "tokens": tokens})
