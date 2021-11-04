@@ -1,8 +1,8 @@
-from rest_framework import generics
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
 from .models import User
-from .serializers import LoginSerializer, RegistrationSerializer, CodeSerializer
+from .serializers import LoginSerializer, LogoutSerializer, RegistrationSerializer, CodeSerializer
 from .utils import send_email
 
 
@@ -51,3 +51,16 @@ class LoginView(generics.GenericAPIView):
         user = serializer.get_user(request.data['email'])
 
         return Response({'tokens': user.tokens()})
+
+
+class LogoutView(generics.GenericAPIView):
+
+    serializer_class = LogoutSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
