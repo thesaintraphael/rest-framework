@@ -22,7 +22,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user = User.objects.filter(email=email).exists()
 
         if user and user.is_verified:
-            raise AuthenticationFailed("User with this email is already exist", "401")
+            raise AuthenticationFailed(
+                "User with this email is already exist", "401")
 
         first_isalpha = attrs["password"][0].isalpha()
         if all(first_isalpha == character.isalpha() for character in attrs["password"]):
@@ -58,6 +59,28 @@ class CodeSerializer(serializers.Serializer):
         users = User.objects.filter(activation_code=code)
         if users.exists():
             return attrs
-        
+
         raise AuthenticationFailed("Wrong code",  "401")
-    
+
+
+class LoginSerializer(serializers.Serializer):
+
+    email = serializers.EmailField()
+    password = serializers.CharField(
+        style={"input_type": "password"}, write_only=True)
+
+    def validate(self, attrs):
+
+        users = User.objects.filter(email=attrs['email'])
+
+        if users.exists():
+            user = users.first()
+            if user.check_password(attrs['password']):
+                return attrs
+
+        raise AuthenticationFailed(
+            'Wrong password email combination', '401')
+
+    def get_user(self, email):
+
+        return User.objects.get(email=email)
