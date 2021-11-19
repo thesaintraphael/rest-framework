@@ -4,7 +4,13 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from .models import User
-from .utils import create_act_code
+from .utils import create_act_code, send_email
+
+
+CODE_TYPE = {
+    ("act_code", "act_code"),
+    ("reset_code", "reset_code")
+}
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -106,3 +112,76 @@ class LogoutSerializer(serializers.Serializer):
             raise ValidationError({'error': "Invalid or expired token"})
 
         return attrs
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        
+        users = User.objects.filter(email=attrs['email'])
+        if not users:
+            raise AuthenticationFailed('No user with such an email', "401")
+        
+        return attrs
+    
+    def send_reset_mail(self, email):
+
+       user = User.objects.get(email=email)
+       user.reset_code = create_act_code(code_type="reset_code")
+       user.save()
+
+       send_email(email, user.reset_code)
+
+
+class VerifyCodeSerializer(serializers.Serializer):
+
+    code = serializers.CharField(max_length=6, min_length=6)
+
+    def validate(self, attrs):
+        code = attrs['code']
+
+        print(User.objects.all().values_list('reset_code'))
+        users = User.objects.filter(reset_code=code)
+        if users.exists():
+            return attrs
+
+        raise AuthenticationFailed("Wrong code",  "401")
+
+
+class ResetPasswordCompleteSerializer(serializers.Serializer):
+
+    code = serializers.CharField(max_length=6)
+    password = serializers.CharField(
+        style={"input_type": "password"}, write_only=True, min_length=6
+    )
+    password_confirm = serializers.CharField(
+        style={"input_type": "password"}, write_only=True, min_length=6
+    )
+
+    def validate(self, attrs):
+
+        users = User.objects.filter(reset_code=attrs['code'])
+        if not users.exists():
+            raise AuthenticationFailed("Wrong code", "401")
+        
+        password1 = attrs['password']
+        password2 = attrs['password_confirm']
+
+        if password2 != password1:
+            raise serializers.ValidationError({"error": "Passwords are not same"})
+        
+        first_isalpha = password1[0].isalpha()
+        if all(first_isalpha == character.isalpha() for character in password1):
+            raise serializers.ValidationError({"error": "Password should contain numbers and letters"})
+
+        return attrs
+    
+    def get_tokens(self, attrs):
+
+        user = User.objects.filter(reset_code=attrs['code']).first()
+        user.reset_code = None
+        user.save()
+
+        return user.tokens

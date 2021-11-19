@@ -2,8 +2,9 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
 from .models import User
-from .serializers import LoginSerializer, LogoutSerializer, RegistrationSerializer, CodeSerializer
+from .serializers import LoginSerializer, LogoutSerializer, RegistrationSerializer, CodeSerializer, ResetPasswordCompleteSerializer, ResetPasswordSerializer, VerifyCodeSerializer
 from .utils import send_email
+from accounts import serializers
 
 
 class RegistrationView(generics.GenericAPIView):
@@ -50,7 +51,7 @@ class LoginView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.get_user(request.data['email'])
 
-        return Response({'tokens': user.tokens()})
+        return Response({'tokens': user.tokens})
 
 
 class LogoutView(generics.GenericAPIView):
@@ -64,3 +65,43 @@ class LogoutView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ResetPasswordMailView(generics.GenericAPIView):
+
+    serializer_class = ResetPasswordSerializer
+
+    def post(self, request):
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.send_reset_mail(serializer.validated_data['email'])
+
+        return Response({"Code is sent to your email"})
+
+
+class VerifyCodeView(generics.GenericAPIView):
+
+    serializer_class = VerifyCodeSerializer
+
+    def post(self, request):
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        return Response({"code": serializer.validated_data['code']})
+
+
+class ResetPasswordCompleteView(generics.GenericAPIView):
+
+    serializer_class = ResetPasswordCompleteSerializer
+    
+    def post(self, request):
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        tokens = serializer.get_tokens(serializer.validated_data)
+
+        return Response({
+            "tokens": tokens,
+        })
