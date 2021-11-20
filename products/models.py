@@ -1,4 +1,5 @@
 from django.db import models
+from accounts.models import User
 
 
 PRODUCT_CATEGORY = [
@@ -15,7 +16,7 @@ class Material(models.Model):
 
 
 class Product(models.Model):
-
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255, blank=True)
     amount = models.FloatField()
