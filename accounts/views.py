@@ -1,15 +1,18 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
+from .renderers import UserRenderer
 from .models import User
 from .serializers import LoginSerializer, LogoutSerializer, RegistrationSerializer, CodeSerializer, ResetPasswordCompleteSerializer, ResetPasswordSerializer, VerifyCodeSerializer
 from .utils import send_email
-from accounts import serializers
 
 
 class RegistrationView(generics.GenericAPIView):
 
     serializer_class = RegistrationSerializer
+    renderer_classes = (UserRenderer, )
+    # IT is also possible to set a default renderer
+    #  from Rest Fr settings in settings.py
 
     def post(self, request):
 
