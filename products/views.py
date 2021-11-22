@@ -30,4 +30,6 @@ class ProductCreate(CreateAPIView):
 class ProductDetail(RetrieveUpdateDestroyAPIView):
 
     serializer_class = ProductSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly, )
+    queryset = Product.objects.all()
+    lookup_field = 'id'

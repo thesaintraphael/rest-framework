@@ -1,3 +1,4 @@
+from re import S
 from rest_framework import serializers
 
 from .models import Product, Material
@@ -49,6 +50,9 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
     def update(self, instance, validated_data):
-        validated_data = validated_data.pop('owner')
-        return super().update(instance, validated_data)
+        materials = pop_materials(validated_data)
+        
+        product = super().update(instance, validated_data)
+        product.materials.set(materials)
 
+        return product
