@@ -38,6 +38,7 @@ class VerifyEmail(generics.GenericAPIView):
         user = User.objects.filter(
             activation_code=serializer.validated_data['code']).first()
         user.activation_code = None
+        user.is_verified = True
         user.save()
         tokens = user.tokens
 

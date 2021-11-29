@@ -83,6 +83,8 @@ class LoginSerializer(serializers.Serializer):
 
         if users.exists():
             user = users.first()
+            if not user.is_verified:
+                raise AuthenticationFailed("Email is not verified", '401')
             if user.check_password(attrs['password']):
                 return attrs
 
@@ -119,20 +121,20 @@ class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def validate(self, attrs):
-        
+
         users = User.objects.filter(email=attrs['email'])
         if not users:
             raise AuthenticationFailed('No user with such an email', "401")
-        
+
         return attrs
-    
+
     def send_reset_mail(self, email):
 
-       user = User.objects.get(email=email)
-       user.reset_code = create_act_code(code_type="reset_code")
-       user.save()
+        user = User.objects.get(email=email)
+        user.reset_code = create_act_code(code_type="reset_code")
+        user.save()
 
-       send_email(email, user.reset_code)
+        send_email(email, user.reset_code)
 
 
 class VerifyCodeSerializer(serializers.Serializer):
@@ -142,7 +144,6 @@ class VerifyCodeSerializer(serializers.Serializer):
     def validate(self, attrs):
         code = attrs['code']
 
-        print(User.objects.all().values_list('reset_code'))
         users = User.objects.filter(reset_code=code)
         if users.exists():
             return attrs
@@ -165,19 +166,21 @@ class ResetPasswordCompleteSerializer(serializers.Serializer):
         users = User.objects.filter(reset_code=attrs['code'])
         if not users.exists():
             raise AuthenticationFailed("Wrong code", "401")
-        
+
         password1 = attrs['password']
         password2 = attrs['password_confirm']
 
         if password2 != password1:
-            raise serializers.ValidationError({"error": "Passwords are not same"})
-        
+            raise serializers.ValidationError(
+                {"error": "Passwords are not same"})
+
         first_isalpha = password1[0].isalpha()
         if all(first_isalpha == character.isalpha() for character in password1):
-            raise serializers.ValidationError({"error": "Password should contain numbers and letters"})
+            raise serializers.ValidationError(
+                {"error": "Password should contain numbers and letters"})
 
         return attrs
-    
+
     def get_tokens(self, attrs):
 
         user = User.objects.filter(reset_code=attrs['code']).first()
