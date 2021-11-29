@@ -15,6 +15,7 @@ drf-yasg==1.20.0
 idna==3.3
 inflection==0.5.1
 itypes==1.2.0
+Faker==9.8.3
 Jinja2==3.0.2
 MarkupSafe==2.0.1
 mypy-extensions==0.4.3
