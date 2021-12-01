@@ -1,4 +1,4 @@
-# Django Queries
+# DRF App
 
 App with JWT authentication, Class Based Views, Serializers, Swagger UI,
 CI/CD and other cool DRF stuff
