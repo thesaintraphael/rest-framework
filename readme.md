@@ -24,3 +24,11 @@ CI/CD and other cool DRF stuff
      4. Run: 
             py manage.py runserver
 
+
+## Executing Tests
+     1. Runnning all tests: 
+            python manage.py test
+     
+     2. Running only unittests (without db creation): 
+            a. python manage.py unittest (custom command)
+            b. python manage.py test --testrunner="unit_test_runner.UnitTestRunner"
