@@ -23,6 +23,7 @@ class Product(models.Model):
     measure_unit = models.CharField(max_length=255)
     category = models.CharField(choices=PRODUCT_CATEGORY, max_length=255)
     price = models.FloatField()
+    image = models.ImageField(upload_to="photos", blank=True, null=True)
     materials = models.ManyToManyField(Material, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
