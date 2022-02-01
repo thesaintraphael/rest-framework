@@ -8,7 +8,7 @@ click==8.0.3
 colorama==0.4.4
 coreapi==2.3.3
 coreschema==0.0.4
-Django==4.0.2
+Django>=3.2.11
 django-cors-headers==3.10.0
 django-filter==21.1
 djangorestframework==3.12.4
