@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
 from .test_urls import PRODUCT_CREATE_URL
+from ..models import Product
 
 class ProductApiTestCase(TestCase):
     
@@ -35,4 +36,7 @@ class ProductApiTestCase(TestCase):
                 "add_materials": False,
             }
         
-            self.client.post(PRODUCT_CREATE_URL, data=data, format="multipart")
+            res = self.client.post(PRODUCT_CREATE_URL, data=data, format="multipart")
+            self.assertEqual(res.status_code, 201)
+            
+            Product.objects.all().delete()

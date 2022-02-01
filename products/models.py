@@ -1,4 +1,8 @@
+import os
+
 from django.db import models
+from django.dispatch import receiver
+
 from accounts.models import User
 
 
@@ -33,3 +37,25 @@ class Product(models.Model):
     class Meta:
         verbose_name_plural = "Products"
         ordering = ['-created_at']
+
+
+@receiver(models.signals.post_delete, sender=Product)
+def auto_delete_image_on_delete(sender, instance, **kwargs):
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
+@receiver(models.signals.pre_save, sender=Product)
+def auto_delete_image_on_change(sender, instance, **kwargs):
+    if not instance.pk:
+        return False
+
+    try:
+        old_image = Product.objects.get(pk=instance.pk).image
+    except Product.DoesNotExist:
+        return False
+
+    new_image = instance.image
+    if not old_image == new_image:
+        if os.path.isfile(old_image.path):
+            os.remove(old_image.path)
