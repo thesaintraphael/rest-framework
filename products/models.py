@@ -41,9 +41,9 @@ class Product(models.Model):
 
 @receiver(models.signals.post_delete, sender=Product)
 def auto_delete_image_on_delete(sender, instance, **kwargs):
-    if instance.image:
-        if os.path.isfile(instance.image.path):
-            os.remove(instance.image.path)
+    if instance.image and os.path.isfile(instance.image.path):
+        os.remove(instance.image.path)
+
 
 @receiver(models.signals.pre_save, sender=Product)
 def auto_delete_image_on_change(sender, instance, **kwargs):

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import Product, Material
-from .utils import pop_materials
+from .utils import validate_materials
 
 
 class MaterialSerializer(serializers.ModelSerializer):
@@ -20,18 +20,21 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = "__all__"
         extra_kwargs = {
-            "owner": {"read_only": True}
+            "owner": {"read_only": True},
+            "materials": {'read_only': True}
         }
 
-    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['materials'] = MaterialSerializer(instance.materials, many=True).data
+        representation['materials'] = MaterialSerializer(
+            instance.materials, many=True).data
         return representation
 
     def validate(self, attrs):
 
-        if attrs['add_materials'] and not attrs['materials']:
+        materials = self.context["materials"]
+
+        if attrs['add_materials'] and not materials:
             raise serializers.ValidationError(
                 {"error": "Materials should be added, if add_materials is set to True"})
 
@@ -41,7 +44,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        materials = pop_materials(validated_data)
+        materials = validate_materials(
+            validated_data, self.context['materials'])
 
         product = Product.objects.create(**validated_data)
         product.materials.set(materials)
@@ -49,8 +53,9 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
     def update(self, instance, validated_data):
-        materials = pop_materials(validated_data)
-        
+        materials = validate_materials(
+            validated_data, self.context['materials'])
+
         product = super().update(instance, validated_data)
         product.materials.set(materials)
 
