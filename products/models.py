@@ -56,6 +56,5 @@ def auto_delete_image_on_change(sender, instance, **kwargs):
         return False
 
     new_image = instance.image
-    if not old_image == new_image:
-        if os.path.isfile(old_image.path):
-            os.remove(old_image.path)
+    if old_image != new_image and os.path.isfile(old_image.path):
+        os.remove(old_image.path)
