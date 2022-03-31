@@ -110,8 +110,8 @@ class LogoutSerializer(serializers.Serializer):
             token = RefreshToken(attrs['refresh_token'])
             token.blacklist()
 
-        except TokenError:
-            raise ValidationError({'error': "Invalid or expired token"})
+        except TokenError as e:
+            raise ValidationError({'error': "Invalid or expired token"}) from e
 
         return attrs
 
