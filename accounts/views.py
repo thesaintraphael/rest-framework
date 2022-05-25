@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
+from products.utils import SerializerUtil
 from .renderers import UserRenderer
 from .models import User
 from .serializers import (LoginSerializer, LogoutSerializer, RegistrationSerializer, CodeSerializer,
@@ -12,17 +13,17 @@ class RegistrationView(generics.GenericAPIView):
 
     serializer_class = RegistrationSerializer
     renderer_classes = (UserRenderer, )
-    # IT is also possible to set a default renderer
+    # It is also possible to set a default renderer
     #  from Rest Fr settings in settings.py
 
     def post(self, request):
 
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data["email"]
-        serializer.save()
+        serializer = SerializerUtil(
+            self.serializer_class).save_serializer(data=request.data)
 
+        email = serializer.validated_data["email"]
         user = User.objects.get(email=email)
+
         send_email(email, user.activation_code)
 
         return Response({"message": "Verification code is sent to your email address"})
@@ -36,6 +37,7 @@ class VerifyEmail(generics.GenericAPIView):
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         user = User.objects.filter(
             activation_code=serializer.validated_data['code']).first()
         user.activation_code = None
@@ -66,8 +68,8 @@ class LogoutView(generics.GenericAPIView):
 
     def post(self, request):
 
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        serializer = self.serializer_class(
+            data=request.data).is_valid(raise_exception=True)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

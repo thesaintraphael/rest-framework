@@ -1,4 +1,5 @@
 import json
+
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework import filters
@@ -6,8 +7,9 @@ from rest_framework import permissions
 
 
 from products.models import Product
-from .serializers import ProductSerializer, serializers
+from .serializers import ProductSerializer
 from .permissions import IsOwnerOrReadOnly
+from .utils import SerializerUtil
 
 
 class ProductsList(ListAPIView):
@@ -38,10 +40,9 @@ class ProductCreate(CreateAPIView):
         else:
             materials = []
 
-        serializer = self.serializer_class(data=request.data, context={
-                                           'request': request, 'materials': materials})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer = SerializerUtil(self.serializer_class).save_serializer(data=request.data, context={
+            'request': request, 'materials': materials})
+
         return Response(serializer.data, status=201)
 
 
