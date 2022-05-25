@@ -9,25 +9,26 @@ from rest_framework.test import APIClient
 from .test_urls import PRODUCT_CREATE_URL
 from ..models import Product
 
+
 class ProductApiTestCase(TestCase):
-    
+
     def setUp(self) -> None:
-        
+
         self.user = get_user_model().objects.create(
-            username="admin", email="admin@gmail.com" 
+            username="admin", email="admin@gmail.com"
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
-    
+
     def test_create_product(self):
-        
+
         with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
             img = Image.new("RGB", (10, 10))
             img.save(ntf, format="JPEG")
             ntf.seek(0)
-        
+
             data = {
-                "name":"Mobile",
+                "name": "Mobile",
                 "amount": 5.6,
                 "measure_unit": "kq",
                 "category": "A",
@@ -35,8 +36,11 @@ class ProductApiTestCase(TestCase):
                 "image": ntf,
                 "add_materials": False,
             }
-        
-            res = self.client.post(PRODUCT_CREATE_URL, data=data, format="multipart")
+
+            res = self.client.post(
+                PRODUCT_CREATE_URL, data=data, format="multipart")
             self.assertEqual(res.status_code, 201)
-            
-            Product.objects.all().delete()
+
+    def tearDown(self) -> None:
+        Product.objects.all().delete()  # calling to force delete files of product model
+        return super().tearDown()
