@@ -12,11 +12,11 @@ class UserCodeUtil:
     _size = 6
 
     @staticmethod
-    def generate_code(chars=string.digits):
-        return ''.join(random.choice(chars) for _ in range(UserCodeUtil._size))
+    def generate_code() -> str:
+        return ''.join(random.choice(string.digits) for _ in range(UserCodeUtil._size))
 
     @staticmethod
-    def create_act_code():
+    def create_act_code() -> str:
         code = UserCodeUtil.generate_code()
         if User.objects.filter(activation_code=code).exists():
             return UserCodeUtil.create_act_code()
@@ -24,7 +24,7 @@ class UserCodeUtil:
         return code
 
     @staticmethod
-    def create_reset_code():
+    def create_reset_code() -> str:
         code = UserCodeUtil.generate_code()
         if User.objects.filter(reset_code=code).exists():
             return UserCodeUtil.create_reset_code()
@@ -32,7 +32,7 @@ class UserCodeUtil:
         return code
 
 
-def send_email(email, code):
+def send_email(email, code) -> None:
 
     email = EmailMessage(
         'Email Verification', f'Code {code}',
