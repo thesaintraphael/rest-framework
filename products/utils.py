@@ -7,6 +7,14 @@ class SerializerUtil:
         self.serializer_class = serializer_class
 
     @staticmethod
+    def validate_password(password: str) -> None:
+        first_isalpha = password[0].isalpha()
+        if all(first_isalpha == character.isalpha() for character in password):
+            raise serializers.ValidationError(
+                {"error": "Password must be consist of at least one digit and letters"}
+            )
+
+    @staticmethod
     def get_request_from_context(context):
         return context.get('request')
 

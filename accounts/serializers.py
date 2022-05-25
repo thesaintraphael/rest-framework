@@ -3,6 +3,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
+from products.utils import SerializerUtil
+
 from .models import User
 from .utils import create_act_code, send_email
 
@@ -33,11 +35,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed(
                 "User with this email is already exist", "401")
 
-        first_isalpha = attrs["password"][0].isalpha()
-        if all(first_isalpha == character.isalpha() for character in attrs["password"]):
-            raise serializers.ValidationError(
-                {"error": "Password must be consis of at least one digit and letters"}
-            )
+        SerializerUtil.validate_password(attrs.get("password"))
 
         return attrs
 
@@ -167,17 +165,14 @@ class ResetPasswordCompleteSerializer(serializers.Serializer):
         if not users.exists():
             raise AuthenticationFailed("Wrong code", "401")
 
-        password1 = attrs['password']
-        password2 = attrs['password_confirm']
+        password = attrs['password']
+        password_confirm = attrs['password_confirm']
 
-        if password2 != password1:
+        if password != password_confirm:
             raise serializers.ValidationError(
                 {"error": "Passwords are not same"})
 
-        first_isalpha = password1[0].isalpha()
-        if all(first_isalpha == character.isalpha() for character in password1):
-            raise serializers.ValidationError(
-                {"error": "Password should contain numbers and letters"})
+        SerializerUtil.validate_password(password)
 
         return attrs
 

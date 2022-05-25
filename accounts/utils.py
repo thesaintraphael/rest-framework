@@ -14,9 +14,11 @@ def generate_code(size=6, chars=string.digits):
 def create_act_code(size=6, code_type=None):
 
     code = generate_code(size)
-    
-    if code_type is None: code_exists = User.objects.filter(activation_code=code).exists()
-    else: code_exists = User.objects.filter(reset_code=code).exists()
+
+    if code_type is None:
+        code_exists = User.objects.filter(activation_code=code).exists()
+    else:
+        code_exists = User.objects.filter(reset_code=code).exists()
 
     if code_exists:
         return create_act_code(size)
