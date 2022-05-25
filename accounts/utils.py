@@ -7,22 +7,29 @@ import string
 import random
 
 
-def generate_code(size=6, chars=string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+class UserCodeUtil:
 
+    _size = 6
 
-def create_act_code(size=6, code_type=None):
+    @staticmethod
+    def generate_code(chars=string.digits):
+        return ''.join(random.choice(chars) for _ in range(UserCodeUtil._size))
 
-    code = generate_code(size)
+    @staticmethod
+    def create_act_code():
+        code = UserCodeUtil.generate_code()
+        if User.objects.filter(activation_code=code).exists():
+            return UserCodeUtil.create_act_code()
 
-    if code_type is None:
-        code_exists = User.objects.filter(activation_code=code).exists()
-    else:
-        code_exists = User.objects.filter(reset_code=code).exists()
+        return code
 
-    if code_exists:
-        return create_act_code(size)
-    return code
+    @staticmethod
+    def create_reset_code():
+        code = UserCodeUtil.generate_code()
+        if User.objects.filter(reset_code=code).exists():
+            return UserCodeUtil.create_reset_code()
+
+        return code
 
 
 def send_email(email, code):

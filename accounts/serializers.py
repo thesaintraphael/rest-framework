@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from products.utils import SerializerUtil
 
 from .models import User
-from .utils import create_act_code, send_email
+from .utils import UserCodeUtil, send_email
 
 
 CODE_TYPE = {
@@ -49,7 +49,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         )
 
         user.set_password(data["password"])
-        user.activation_code = create_act_code()
+        user.activation_code = UserCodeUtil.create_act_code()
         user.save()
 
         return user
@@ -129,7 +129,7 @@ class ResetPasswordSerializer(serializers.Serializer):
     def send_reset_mail(self, email):
 
         user = User.objects.get(email=email)
-        user.reset_code = create_act_code(code_type="reset_code")
+        user.reset_code = UserCodeUtil.create_reset_code()
         user.save()
 
         send_email(email, user.reset_code)
