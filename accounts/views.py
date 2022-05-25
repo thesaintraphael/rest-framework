@@ -68,7 +68,7 @@ class LogoutView(generics.GenericAPIView):
 
     def post(self, request):
 
-        serializer = self.serializer_class(
+        self.serializer_class(
             data=request.data).is_valid(raise_exception=True)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
