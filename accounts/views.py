@@ -3,7 +3,8 @@ from rest_framework.response import Response
 
 from .renderers import UserRenderer
 from .models import User
-from .serializers import LoginSerializer, LogoutSerializer, RegistrationSerializer, CodeSerializer, ResetPasswordCompleteSerializer, ResetPasswordSerializer, VerifyCodeSerializer
+from .serializers import (LoginSerializer, LogoutSerializer, RegistrationSerializer, CodeSerializer,
+                          ResetPasswordCompleteSerializer, ResetPasswordSerializer, VerifyCodeSerializer)
 from .utils import send_email
 
 
@@ -92,14 +93,14 @@ class VerifyCodeView(generics.GenericAPIView):
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         return Response({"code": serializer.validated_data['code']})
 
 
 class ResetPasswordCompleteView(generics.GenericAPIView):
 
     serializer_class = ResetPasswordCompleteSerializer
-    
+
     def post(self, request):
 
         serializer = self.serializer_class(data=request.data)
