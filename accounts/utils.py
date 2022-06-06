@@ -9,25 +9,25 @@ import random
 
 class UserCodeUtil:
 
-    _size = 6
+    def __init__(self, size=6) -> None:
+        """Allowing to set a different size of code if needed"""
+        self._size = size
 
     @staticmethod
-    def generate_code() -> str:
-        return ''.join(random.choice(string.digits) for _ in range(UserCodeUtil._size))
+    def generate_code(size: int) -> str:
+        return ''.join(random.choice(string.digits) for _ in range(size))
 
-    @staticmethod
-    def create_act_code() -> str:
-        code = UserCodeUtil.generate_code()
+    def create_act_code(self) -> str:
+        code = self.generate_code(self._size)
         if User.objects.filter(activation_code=code).exists():
-            return UserCodeUtil.create_act_code()
+            return self.create_act_code()
 
         return code
 
-    @staticmethod
-    def create_reset_code() -> str:
-        code = UserCodeUtil.generate_code()
+    def create_reset_code(self) -> str:
+        code = self.generate_code(self._size)
         if User.objects.filter(reset_code=code).exists():
-            return UserCodeUtil.create_reset_code()
+            return self.create_reset_code()
 
         return code
 
