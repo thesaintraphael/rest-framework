@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import sys
+import logging
 from datetime import timedelta
 from decouple import config
 
@@ -105,6 +106,8 @@ if "test" in sys.argv:
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'sqlite_test.db',
     }
+
+    logging.disable(logging.CRITICAL)
 
 
 # Password validation
