@@ -66,7 +66,7 @@ class CodeSerializer(serializers.Serializer):
         if users.exists():
             return attrs
 
-        raise AuthenticationFailed("Wrong code",  "401")
+        raise AuthenticationFailed("Wrong code", "401")
 
 
 class LoginSerializer(serializers.Serializer):
@@ -146,7 +146,7 @@ class VerifyCodeSerializer(serializers.Serializer):
         if users.exists():
             return attrs
 
-        raise AuthenticationFailed("Wrong code",  "401")
+        raise AuthenticationFailed("Wrong code", "401")
 
 
 class ResetPasswordCompleteSerializer(serializers.Serializer):
