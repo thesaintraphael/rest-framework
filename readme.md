@@ -32,3 +32,6 @@ CI/CD and other cool DRF stuff
      2. Running only unittests (without db creation): 
             a. python manage.py unittest (custom command)
             b. python manage.py test --testrunner="unit_test_runner.UnitTestRunner"
+
+     3. Running pytest: 
+            pytest tests/     
