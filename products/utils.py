@@ -1,4 +1,4 @@
-from . import serializers
+from rest_framework import serializers
 
 
 class SerializerUtil:
