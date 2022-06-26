@@ -9,12 +9,6 @@ from .models import User
 from .utils import UserCodeUtil, send_email
 
 
-CODE_TYPE = {
-    ("act_code", "act_code"),
-    ("reset_code", "reset_code")
-}
-
-
 class RegistrationSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(
