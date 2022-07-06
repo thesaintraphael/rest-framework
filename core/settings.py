@@ -43,15 +43,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Local aps
+    'accounts.apps.AccountsConfig',
+    'products.apps.ProductsConfig',
+
     # 3rd Party
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'corsheaders',
-
-    # Local aps
-    'accounts.apps.AccountsConfig',
-    'products.apps.ProductsConfig',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

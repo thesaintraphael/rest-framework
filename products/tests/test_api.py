@@ -1,13 +1,16 @@
 import tempfile
 from PIL import Image
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 
 from rest_framework.test import APIClient
 
 from .test_urls import PRODUCT_CREATE_URL
-from ..models import Product
+from .utils import remove_upladed_files
+
+
+TEST_DIR = "tests/media/"
 
 
 class ProductApiTestCase(TestCase):
@@ -20,6 +23,7 @@ class ProductApiTestCase(TestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
+    @override_settings(MEDIA_ROOT=TEST_DIR)
     def test_create_product(self):
 
         with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
@@ -42,5 +46,4 @@ class ProductApiTestCase(TestCase):
             self.assertEqual(res.status_code, 201)
 
     def tearDown(self) -> None:
-        Product.objects.all().delete()  # calling to force delete files of product model
-        return super().tearDown()
+        remove_upladed_files(TEST_DIR)
